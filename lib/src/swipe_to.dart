@@ -163,17 +163,22 @@ class _SwipeToState extends State<SwipeTo> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onPanUpdate: (details) {
-        if (details.delta.dx > widget.swipeSensitivity &&
-            widget.onRightSwipe != null) {
-          _runAnimation(onRight: true, details: details);
-        }
-        if (details.delta.dx < -(widget.swipeSensitivity) &&
-            widget.onLeftSwipe != null) {
-          _runAnimation(onRight: false, details: details);
-        }
+    return RawGestureDetector(
+      gestures: <Type, GestureRecognizerFactory>{
+        HorizontalDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<HorizontalDragGestureRecognizer>(
+          () => HorizontalDragGestureRecognizer(debugOwner: this),
+          (HorizontalDragGestureRecognizer instance) {
+            instance.onUpdate = (details) {
+              if (details.delta.dx > widget.swipeSensitivity && widget.onRightSwipe != null) {
+                _runAnimation(onRight: true, details: details);
+              } else if (details.delta.dx < -widget.swipeSensitivity && widget.onLeftSwipe != null) {
+                _runAnimation(onRight: false, details: details);
+              }
+            };
+          },
+        ),
       },
+      behavior: HitTestBehavior.translucent,
       child: Stack(
         alignment: Alignment.center,
         fit: StackFit.passthrough,
